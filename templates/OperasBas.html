@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block container %}
+
+<h1>Calcular</h1>
+<div class="col-md-6">
+    <form action="/OperasBas" method="post">
+        <label>N1:
+        <input type="number" name="n1"><br>
+        <label>N2:
+        <input type="number" name="n2"><br>
+        <input type="submit" value="Calcular" class="btn btn-primary">
+        </label>
+    </form>
+</div>
+
+<div class="col-md-6">
+    {% if resultado %}
+        <div style="margin-left: 20px; font-weight: bold;">
+            {{ resultado }}
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

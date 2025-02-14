@@ -24,6 +24,49 @@ def resultado():
         num2 = request.form.get("n2")
         return "La suma de {} + {} es {}".format(num1, num2,int(num1)+int(num2))
 
+@app.route('/cinepolis', methods=["GET", "POST"])
+def cinepolis():
+    
+    total_pagar = 0
+    resultado = 0
+    nombre = ""
+    compradores = ""
+    tarjeta = ""
+    boletos = ""
+
+    if request.method == "POST":
+        
+        #Traer los dato
+        nombre = request.form.get("nombre")
+        compradores = int(request.form.get("compradores"))
+        tarjeta = request.form.get("tarjeta")
+        boletos = int(request.form.get("boletos"))
+        
+        #Validar boletos
+        maxboletos = compradores * 7
+        if boletos > maxboletos:
+            resultado = f"No puedes comprar más de {maxboletos} boletos."
+        else:
+            precio_boleto = 12
+            total_pagar = boletos * precio_boleto
+
+            #Aplicar descuentos
+            if boletos > 5:
+                descuento = total_pagar * 0.15
+                total_pagar -= descuento
+            elif 3 <= boletos <= 5:
+                descuento = total_pagar * 0.10
+                total_pagar -= descuento
+
+            # Validación de tarjeta
+            if tarjeta == "Si":
+                descuento_tarjeta = total_pagar * 0.10
+                total_pagar -= descuento_tarjeta
+            
+            resultado = f"{ nombre } debe pagar la cantidad de $ { total_pagar } por adquirir { boletos } boletos"
+
+    return render_template("cinepolis.html", resultado=resultado)
+
 @app.route('/ejemplo1')
 def ejemplo1():
     return render_template("ejemplo1.html")
@@ -70,8 +113,6 @@ def form1():
         </br>
         </form>
     '''
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=3000)

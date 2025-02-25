@@ -1,12 +1,52 @@
 from flask import Flask, render_template, request
+from flask import g
+from flask_wtf.csrf import CSRFProtect
+from flask import flash
+import forms
 
-app = Flask(__name__) #Se crea la aplicacion como tal
+app = Flask(__name__) 
+app.secret_key="Esta es la clave secreta"
+csrf = CSRFProtect()
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.before_request
+def before_request():
+    g.nombre = "Mario"
+    print(' Before request 1')
+
+@app.after_request
+def after_request(response):
+    print(' After request 3')
+    return response
 
 @app.route('/')
 def index():
     grupo="IDGS803"
     lista = ["Juan", "Pedro", "Mario"]
+    print('Index 2')
+    print('Hola {}', format(g.nombre))
     return render_template("index.html", grupo=grupo, lista=lista) #Abre el archivo html con el render
+
+@app.route('/Alumnos', methods=["GET","POST"])
+def alumnos():
+    mat=''
+    nom=''
+    edad=''
+    correo=''
+    ape=''
+    alumno_clase = forms.UserForm(request.form)
+    if request.method == 'POST' and alumno_clase.validate():
+        mat=alumno_clase.matricula.data
+        nom=alumno_clase.nombre.data
+        ape=alumno_clase.apellidos.data
+        edad=alumno_clase.edad.data
+        correo=alumno_clase.correo.data
+        mensaje = 'Bienvenido {}'.format(nom)
+        flash(mensaje)
+    return render_template("Alumnos.html", form=alumno_clase, mat=mat, nom=nom, ape=ape, edad=edad, correo=correo)
 
 @app.route('/OperasBas', methods=["GET","POST"])
 def operas():
@@ -115,4 +155,5 @@ def form1():
     '''
 
 if __name__ == '__main__':
+    csrf.init_app(app)
     app.run(debug=True, port=3000)
